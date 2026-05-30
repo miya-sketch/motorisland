@@ -1022,7 +1022,7 @@ const LANGS = {
     heroDesc:       'Sau khi điền xong, <strong style="color:var(--neon)">trụ sở chính</strong> sẽ xét duyệt<br>Sau khi duyệt, thẻ quà 7-11 sẽ được gửi qua LINE chính thức',
     slogan:         'Tay ta đen, lòng ta sáng.',
     sloganSub:      'Good Rides Better Life — 2motor.tw',
-    sl1: 'Cửa hàng', sl2: 'Người giới thiệu', sl3: 'Người mua',
+    sl1: 'Cửa hàng', sl2: 'Người giới thiệu', sl3: 'Chủ xe mới',
     p1Num:   'Bước 01 / 03',
     p1Title: 'Cửa hàng giao dịch',
     p1Desc:  'Vui lòng chọn cửa hàng bạn đã mua xe hôm nay',
@@ -1224,7 +1224,8 @@ function submitForm() {
   });
 
   fetch(FORM_ACTION, {
-    method: 'POST', mode: 'no-cors',
+    method: 'POST',
+    mode: 'no-cors',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: body.toString()
   }).then(() => {
@@ -1234,7 +1235,7 @@ function submitForm() {
     document.querySelector('.slogan-bar').style.display = 'none';
     document.getElementById('successPage').style.display = 'block';
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }).catch(() => {
+  }).catch((err) => {
     document.getElementById('loadingOverlay').classList.remove('show');
     btn.disabled = false;
     alert(LANGS[currentLang].submitErr);
