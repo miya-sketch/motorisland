@@ -1209,7 +1209,6 @@ document.querySelectorAll('.field-input, .field-select').forEach(el => {
 function submitForm() {
   // 強制驗證全部三頁，確保資料完整
   if (!validatePage(1) || !validatePage(2) || !validatePage(3)) {
-    // 如果有任何頁沒填，跳回有問題的頁面
     if (!validatePage(1)) { showPage(1); return; }
     if (!validatePage(2)) { showPage(2); return; }
     if (!validatePage(3)) return;
@@ -1218,22 +1217,19 @@ function submitForm() {
   btn.disabled = true;
   document.getElementById('loadingOverlay').classList.add('show');
 
-  const body = new URLSearchParams({
-    'entry.745321504': document.getElementById('store').value,
-    'entry.1291141226': document.getElementById('refName').value,
-    'entry.2076793322': document.getElementById('refPhone').value,
-    'entry.676137459':  document.getElementById('refPlate').value,
-    'entry.1042422356': document.getElementById('newName').value,
-    'entry.483520766':  document.getElementById('newPhone').value,
-    'entry.670206957':  document.getElementById('newPlate').value,
-    'fvv': '1', 'pageHistory': '0,1,2'
+  const params = new URLSearchParams({
+    store:    document.getElementById('store').value,
+    refName:  document.getElementById('refName').value,
+    refPhone: document.getElementById('refPhone').value,
+    refPlate: document.getElementById('refPlate').value,
+    newName:  document.getElementById('newName').value,
+    newPhone: document.getElementById('newPhone').value,
+    newPlate: document.getElementById('newPlate').value,
   });
 
-  fetch(FORM_ACTION, {
-    method: 'POST',
+  fetch('https://script.google.com/macros/s/AKfycbxJEAvxd15dsMKXDmKm0-iRkwZPYZAk0dwfuzpmW8gyR3UVlaxjxKPx8Gqa0RDdI8dvNQ/exec?' + params.toString(), {
+    method: 'GET',
     mode: 'no-cors',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: body.toString()
   }).then(() => {
     document.getElementById('loadingOverlay').classList.remove('show');
     document.getElementById('formWrap').style.display = 'none';
