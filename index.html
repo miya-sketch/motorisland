@@ -1207,7 +1207,13 @@ document.querySelectorAll('.field-input, .field-select').forEach(el => {
 });
 
 function submitForm() {
-  if (!validatePage(3)) return;
+  // 強制驗證全部三頁，確保資料完整
+  if (!validatePage(1) || !validatePage(2) || !validatePage(3)) {
+    // 如果有任何頁沒填，跳回有問題的頁面
+    if (!validatePage(1)) { showPage(1); return; }
+    if (!validatePage(2)) { showPage(2); return; }
+    if (!validatePage(3)) return;
+  }
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
   document.getElementById('loadingOverlay').classList.add('show');
