@@ -1207,7 +1207,7 @@ document.querySelectorAll('.field-input, .field-select').forEach(el => {
 });
 
 function submitForm() {
-  // 強制驗證全部三頁，確保資料完整
+  // 強制驗證全部三頁
   if (!validatePage(1) || !validatePage(2) || !validatePage(3)) {
     if (!validatePage(1)) { showPage(1); return; }
     if (!validatePage(2)) { showPage(2); return; }
@@ -1217,27 +1217,53 @@ function submitForm() {
   btn.disabled = true;
   document.getElementById('loadingOverlay').classList.add('show');
 
-  const params = new URLSearchParams({
-    store:    document.getElementById('store').value,
-    refName:  document.getElementById('refName').value,
-    refPhone: document.getElementById('refPhone').value,
-    refPlate: document.getElementById('refPlate').value,
-    newName:  document.getElementById('newName').value,
-    newPhone: document.getElementById('newPhone').value,
-    newPlate: document.getElementById('newPlate').value,
+  const store    = document.getElementById('store').value;
+  const refName  = document.getElementById('refName').value;
+  const refPhone = document.getElementById('refPhone').value;
+  const refPlate = document.getElementById('refPlate').value;
+  const newName  = document.getElementById('newName').value;
+  const newPhone = document.getElementById('newPhone').value;
+  const newPlate = document.getElementById('newPlate').value;
+
+  // 送到 Apps Script Web App（主要資料來源）
+  const webAppUrl = 'https://script.google.com/macros/s/AKfycbxJEAvxd15dsMKXDmKm0-iRkwZPYZAk0dwfuzpmW8gyR3UVlaxjxKPx8Gqa0RDdI8dvNQ/exec'
+    + '?store='    + encodeURIComponent(store)
+    + '&refName='  + encodeURIComponent(refName)
+    + '&refPhone=' + encodeURIComponent(refPhone)
+    + '&refPlate=' + encodeURIComponent(refPlate)
+    + '&newName='  + encodeURIComponent(newName)
+    + '&newPhone=' + encodeURIComponent(newPhone)
+    + '&newPlate=' + encodeURIComponent(newPlate);
+
+  // 同時送到 Google 表單（備份）
+  const formBody = new URLSearchParams({
+    'entry.745321504': store,
+    'entry.1291141226': refName,
+    'entry.2076793322': refPhone,
+    'entry.676137459':  refPlate,
+    'entry.1042422356': newName,
+    'entry.483520766':  newPhone,
+    'entry.670206957':  newPlate,
+    'fvv': '1', 'pageHistory': '0,1,2'
   });
 
-  fetch('https://script.google.com/macros/s/AKfycbxJEAvxd15dsMKXDmKm0-iRkwZPYZAk0dwfuzpmW8gyR3UVlaxjxKPx8Gqa0RDdI8dvNQ/exec?' + params.toString(), {
-    method: 'GET',
-    mode: 'no-cors',
-  }).then(() => {
+  // 先送 Web App，再送 Google 表單
+  Promise.all([
+    fetch(webAppUrl, { method: 'GET', mode: 'no-cors' }),
+    fetch('https://docs.google.com/forms/u/0/d/e/1FAIpQLSez_bd2aZF1IwACpXKg-So0iZ_1ImWhztoPib9w1ajv6N24sw/formResponse', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formBody.toString()
+    })
+  ]).then(() => {
     document.getElementById('loadingOverlay').classList.remove('show');
     document.getElementById('formWrap').style.display = 'none';
     document.querySelector('.progress-wrap').style.display = 'none';
     document.querySelector('.slogan-bar').style.display = 'none';
     document.getElementById('successPage').style.display = 'block';
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }).catch((err) => {
+  }).catch(() => {
     document.getElementById('loadingOverlay').classList.remove('show');
     btn.disabled = false;
     alert(LANGS[currentLang].submitErr);
